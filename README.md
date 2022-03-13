@@ -20,6 +20,14 @@ disclaimer:
    Если будут проблемы, можно еще попробовать Wemos с HardwareSerial (пока не изучал вопрос).
    ![Image alt](https://github.com/DieMetRik/mecrury_esphome/blob/main/esp01s/Schemes/Mercury_EPS01s.png)
 
+Для соответствующего сетапа потребуется:
+Скопировать 2 файла в /config/esphome/mercury/
+- mercury-200.02.h
+- sensor.py
+
+Сожержимое yaml файла скопировать в свой проект в ESPHome 
+Поменять адресс счетчика в файле "mercury-200.02.h"
+
 В Home Assistant сделал вот так:
 ![Image alt](https://github.com/DieMetRik/mecrury_esphome/blob/main/HomeAssistant/Dashboard.png)
 Прокинул все в Energy Management и получилось вот так:

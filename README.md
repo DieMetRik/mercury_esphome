@@ -30,6 +30,7 @@ ESP01s заказывал у Win Win с Алика https://aliexpress.ru/item/20
 GND + IO0
 3.3V + EN
 Я припаял 8 pin к программатору с другой сторны и просто сделал перемычками. Получилось универсально.
+
 ![Image alt](https://github.com/DieMetRik/mecrury_esphome/blob/main/esp01s/Schemes/ESP01s_USB.jpg)
 Wemos D1 mini V3.0.0 там же https://aliexpress.ru/item/32651747570.html
 

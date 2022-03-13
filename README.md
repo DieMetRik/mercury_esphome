@@ -22,7 +22,10 @@ disclaimer:
 
 В Home Assistant сделал вот так:
 ![Image alt](https://github.com/DieMetRik/mecrury_esphome/blob/main/HomeAssistant/Dashboard.png)
-+ настроил отправку показаний в Энергосбыт через интеграцию (Личный кабинет Интер РАО устанавливается через HACS) + Node-Red для формирования данных
+Прокинул все в Энергомонитор и получилось вот так:
+![Image alt](https://github.com/DieMetRik/mecrury_esphome/blob/main/HomeAssistant/Energy.JPG)
+
++ настроил отправку показаний в Энергосбыт через интеграцию "Личный кабинет Интер РАО" (устанавливается через HACS) + Node-Red для формирования данных.
 
 ESP01s заказывал у Win Win с Алика https://aliexpress.ru/item/2037396994.html
 Для ESP01s первый раз нужен программатор, я использовал: https://aliexpress.ru/item/32688280601.html

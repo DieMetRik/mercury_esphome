@@ -1,0 +1,137 @@
+esphome:
+  name: mercury-206
+  platform: ESP8266
+  board: d1_mini
+  includes:
+    - /config/esphome/mercury/mercury-200.02.h #Указываем свой путь до файла
+
+# Enable logging
+logger:
+
+
+# Enable Home Assistant API
+api:
+  password: !secret ha_password
+web_server:
+  port: 80
+  auth:
+    username: !secret web_server_login
+    password: !secret web_server_password  
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Optional manual IP
+  manual_ip:
+    static_ip: 192.168.1.133
+    gateway: 192.168.1.1
+    subnet: 255.255.255.0
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "mercury-206"
+    password: !secret ap_password
+
+captive_portal:
+
+uart:
+  id: uart_bus
+  tx_pin: 5
+  rx_pin: 4
+  baud_rate: 9600
+
+sensor:
+  - platform: template
+    id: Volts
+    name: mercury_voltage
+    icon: "mdi:alpha-v-circle-outline"
+    unit_of_measurement: "V"
+    accuracy_decimals: 1
+    lambda: "return {};"
+
+  - platform: template
+    id: Amps
+    name: mercury_current
+    icon: "mdi:alpha-a-circle-outline"
+    unit_of_measurement: "A"
+    accuracy_decimals: 2
+    lambda: "return {};"
+
+  - platform: template
+    id: Watts
+    name: mercury_power
+    icon: "mdi:alpha-p-circle-outline"
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    lambda: "return {};"
+
+  - platform: template
+    id: Tariff1
+    name: mercury_t1_energy
+    icon: "mdi:counter"
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    device_class: energy
+    state_class: total_increasing
+    lambda: "return {};"
+
+  - platform: template
+    id: Tariff2
+    name: mercury_t2_energy
+    icon: "mdi:counter"
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    device_class: energy
+    state_class: total_increasing
+    lambda: "return {};"
+
+  - platform: template
+    id: Tariff3
+    name: mercury_t3_energy
+    icon: "mdi:counter"
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    device_class: energy
+    state_class: total_increasing
+    lambda: "return {};"
+
+  - platform: template
+    id: Sum_Tariff
+    name: mercury_sum_tariff
+    icon: "mdi:counter"
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    lambda: "return {};"
+
+  - platform: template
+    id: Freq
+    name: mercury_frequency
+    icon: "mdi:counter"
+    unit_of_measurement: "Hz"
+    accuracy_decimals: 2
+    lambda: "return {};"
+
+  - platform: template
+    id: CRC_OUT
+    name: mercury_crc
+    accuracy_decimals: 0
+    lambda: "return {};"
+
+text_sensor:
+  - platform: template
+    name: mercury_datetime
+    id: dt_string
+    lambda: "return {};"
+
+custom_component: 
+
+  - lambda: |-
+      auto my_mercury = new Mercury(id(uart_bus), id(Volts), id(Amps), id(Watts), id(Tariff1), id(Tariff2), id(Tariff3), id(Sum_Tariff), id(Freq), id(dt_string), id(CRC_OUT));
+      App.register_component(my_mercury);
+      return {my_mercury};
+      
+      

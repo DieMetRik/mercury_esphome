@@ -1,4 +1,5 @@
-// Telegram @RocketFox
+//Original code: Telegram @RocketFox
+//My telegram https://t.me/DieMetRik
 
 #include "esphome.h"
 
@@ -15,7 +16,7 @@ class Mercury : public PollingComponent, public UARTDevice {
 
 	Sensor *CRC_OUT {nullptr};
 
-	int seriall = 319;  // сюда свой серийный номер счетчика
+	int seriall = 001;  // сюда свой серийный номер счетчика
 
 	public:
 	Mercury(UARTComponent *parent, Sensor *sensor1, Sensor *sensor2, Sensor *sensor3, Sensor *sensor4, Sensor *sensor5, Sensor *sensor6, Sensor *sensor7, Sensor *sensor8, TextSensor *sensor9, Sensor *sensor10) : UARTDevice(parent) , Volts(sensor1) , Amps(sensor2) , Watts(sensor3), Tariff1(sensor4), Tariff2(sensor5), Tariff3(sensor6), Sum_Tariff(sensor7), Freq(sensor8), dt_string(sensor9), CRC_OUT(sensor10) {}
@@ -33,10 +34,6 @@ class Mercury : public PollingComponent, public UARTDevice {
 	double T1_f, T2_f, T3_f;
 	uint8_t crc_good_f;
 	bool crc_good[8];
-
-//	int hh, mm, ss, dd, mon, yy;	//DateTime from Mercury
-//	double V, A, W, F;
-//	double T1, T2, T3, sum;
 
 	String hh_s, mm_s, ss_s, dd_s, mon_s, yy_s;	//DateTime from Mercury
 	String dt_str;
@@ -197,7 +194,6 @@ class Mercury : public PollingComponent, public UARTDevice {
 		write_array(command, 7);
 		delay(12);
 		digitalWrite(0, LOW);
-		//delay(13);
 
 		while (available())
 		{
@@ -316,8 +312,7 @@ class Mercury : public PollingComponent, public UARTDevice {
 
 		// Передача данные в HA
 
-//		if (dt_str != "" && V_f > 0 && F_f > 0 && sum > 0){
-			// ЕСЛИ ВСЕ ДАННЫЕ ПРИСУТСТВУЮТ, ОПУБЛИКОВАТЬ В HA
+		// ЕСЛИ ВСЕ ДАННЫЕ ПРИСУТСТВУЮТ, ОПУБЛИКОВАТЬ В HA
 
 		if (V_f > 0){
 			if (Volts != nullptr) Volts->publish_state(V_f);	// Отправка в как сенсор
@@ -331,9 +326,8 @@ class Mercury : public PollingComponent, public UARTDevice {
 			if (Tariff3 != nullptr) Tariff3->publish_state(T3_f);
 			if (Sum_Tariff != nullptr) Sum_Tariff->publish_state(sum);
 			if (dt_str != ""){
-				if (dt_string != nullptr) dt_string->publish_state(dt_str.c_str());
+				if (dt_string != nullptr) dt_string->publish_state(dt_str.c_str()); // ДАТА ЗАПИСЫВАЕТСЯ ЕСЛИ ТОЛЬКО ЕСТЬ ДАННЫЕ ПО ТАРИФАМ
 			}
-
 		}
 		if (F_f > 0) {
 			if (Freq != nullptr) Freq->publish_state(F_f);

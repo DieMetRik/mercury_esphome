@@ -22,8 +22,9 @@ disclaimer:
 
 В Home Assistant сделал вот так:
 ![Image alt](https://github.com/DieMetRik/mecrury_esphome/blob/main/HomeAssistant/Dashboard.png)
-Прокинул все в Энергомонитор и получилось вот так:
+Прокинул все в Energy Management и получилось вот так:
 ![Image alt](https://github.com/DieMetRik/mecrury_esphome/blob/main/HomeAssistant/Energy.JPG)
+Цены по тарифам взял из интеграции "Личный кабинет Интер РАО"
 
 + настроил отправку показаний в Энергосбыт через интеграцию "Личный кабинет Интер РАО" (устанавливается через HACS) + Node-Red для формирования данных.
 

@@ -19,7 +19,14 @@ disclaimer:
 3. Третий сетап аналогичен второму, только Wemos заменил на ESP-01s с HardwareSerial, работает стабильно. Больше трогать не буду.
    Если будут проблемы, можно еще попробовать Wemos с HardwareSerial (пока не изучал вопрос).
    ![Image alt](https://github.com/DieMetRik/mercury_esphome/blob/main/esp01s/Schemes/Mercury_EPS01s.png)
-
+4. Купил новую плату для Modbus https://aliexpress.ru/item/32817720482.html c ней стало намного проще работать. Рекомендую именно ее.
+   Там все просто:
+   - 3.3 <-> VCC 
+   - RX <-> RX
+   - TX <-> TX
+   - GND <-> GND
+   В этой плате не нужно подавать дополнительно сигнал на чтение\запись, что упрощает и сборку и код
+   
 Для соответствующего сетапа потребуется:
 Скопировать 2 файла в /config/esphome/mercury/
 - mercury-200.02.h

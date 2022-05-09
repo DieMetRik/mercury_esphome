@@ -26,6 +26,7 @@ disclaimer:
    - TX <-> TX
    - GND <-> GND
    В этой плате не нужно подавать дополнительно сигнал на чтение\запись, что упрощает и сборку и код
+   ![Image alt](https://github.com/DieMetRik/mercury_esphome/blob/main/esp01s/Schemes/Mercury_EPS01s_4.jpg)
    
 Для соответствующего сетапа потребуется:
 Скопировать 2 файла в /config/esphome/mercury/

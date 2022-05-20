@@ -16,7 +16,7 @@ class Mercury : public PollingComponent, public UARTDevice {
 
 	Sensor *CRC_OUT {nullptr};
 
-	int seriall = 001;  // сюда свой серийный номер счетчика
+	uint32_t seriall = 42698492;  // сюда свой серийный номер счетчика
 
 	public:
 	Mercury(UARTComponent *parent, Sensor *sensor1, Sensor *sensor2, Sensor *sensor3, Sensor *sensor4, Sensor *sensor5, Sensor *sensor6, Sensor *sensor7, Sensor *sensor8, TextSensor *sensor9, Sensor *sensor10) : UARTDevice(parent) , Volts(sensor1) , Amps(sensor2) , Watts(sensor3), Tariff1(sensor4), Tariff2(sensor5), Tariff3(sensor6), Sum_Tariff(sensor7), Freq(sensor8), dt_string(sensor9), CRC_OUT(sensor10) {}
@@ -72,28 +72,6 @@ class Mercury : public PollingComponent, public UARTDevice {
 			return (double) readLong<N> (inp) / del;
 		}
 	//////////////////////
-
-	uint16_t crc16(const uint8_t *data, uint8_t len)
-	{
-		uint16_t crc = 0xFFFF;
-		while (len--)
-		{
-			crc ^= *data++;
-			for (uint8_t i = 0; i < 8; i++)
-			{
-				if ((crc & 0x01) != 0)
-				{
-					crc >>= 1;
-					crc ^= 0xA001;
-				}
-				else
-				{
-					crc >>= 1;
-				}
-			}
-		}
-		return crc;
-	}
 
 	uint16_t crc16_full(const uint16_t *data, uint16_t len)
 	{
@@ -166,12 +144,17 @@ class Mercury : public PollingComponent, public UARTDevice {
 	}
 	void calculateParams(unsigned char *frame, uint32_t serial_, unsigned char comm)
 	{
-		frame[0] = 0x00;
+		frame[0] = serial_ >> 24;
 		frame[1] = serial_ >> 16;
 		frame[2] = serial_ >> 8;
 		frame[3] = serial_;
 		frame[4] = comm;
-		auto crc = crc16(frame, 5);
+		uint16_t fr[6];
+		for (int i = 0; i <= 5; i++)
+		{
+			fr[i] = frame[i];
+		}
+		auto crc = crc16_full(fr, 5);
 		frame[5] = crc >> 0;
 		frame[6] = crc >> 8;
 	}

@@ -224,7 +224,7 @@ class Mercury : public PollingComponent, public UARTDevice {
 //==========================================================================================================
 // ПРОВЕРКА ПОЛУЧЕНЫЙ ДАННЫХ
 // ТАРИФЫ
-		if (Re_buf[0] == 0x00 && Re_buf[4] == 0x27)		
+		if (Re_buf[4] == 0x27)		
 		{
 
 			if (crc_check(Re_buf, 20)==1) {
@@ -246,7 +246,7 @@ class Mercury : public PollingComponent, public UARTDevice {
 			}
 		}
 // НАПРЯЖЕНИЕ, ТОК, МОЩНОСТЬ
-		if (Re_buf[0] == 0x00 && Re_buf[4] == 0x63)		
+		if (Re_buf[4] == 0x63)		
 		{
 			if (crc_check(Re_buf, 11)==1) {				// Проверяем CRC пришедшего сообщения
 				crc_good[1] = 1;
@@ -265,7 +265,7 @@ class Mercury : public PollingComponent, public UARTDevice {
 			}
 		}
 // ЧАСТОТА
-		if (Re_buf[0] == 0x00 && Re_buf[4] == 0x81){		
+		if (Re_buf[4] == 0x81){		
 			if (crc_check(Re_buf, 14)==1) {				// Проверяем CRC пришедшего сообщения
 				crc_good[2] = 1;
 				double F = readDouble(&Re_buf[5], 100);		// Парсинг байтов и перевод в нормальные значения
@@ -278,7 +278,7 @@ class Mercury : public PollingComponent, public UARTDevice {
 
 		}
 // ДАТА И ВРЕМЯ
-		if (Re_buf[0] == 0x00 && Re_buf[4] == 0x21){		
+		if (Re_buf[4] == 0x21){		
 			if (crc_check(Re_buf, 11)==1) {				// Проверяем CRC пришедшего сообщения
 				crc_good[3] = 1;
 

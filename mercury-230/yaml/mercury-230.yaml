@@ -1,0 +1,338 @@
+#Автор кода https://github.com/Brokly/ESPHome-Mercury230
+#My telegram https://t.me/DieMetRik
+
+# Подключение ног ESP32
+# 
+# Обязательный элемент
+#  ModBus adapter  https://esphome.io/_images/rs485.jpg
+#    tx_pin: GPIO14
+#    rx_pin: GPIO27
+# Дополнительные элементы, для работы не нужны
+#  Led Red:   gpio4
+#  Led Blue:  gpio16
+#  Button:    gpio32
+#  Relay:     gpio13
+
+# Имя устройства
+substitutions:
+  devicename: mercury-230
+  upper_devicename: Mercury-230
+  location: В электрощите. # место установки
+  device_ip: 192.168.1.132
+
+
+external_components:
+  - source: 
+      type: local
+      path: my_components     
+    components: [ energy_meter_mercury230 ]
+    refresh: 0s
+
+esphome:
+  name: $devicename
+  includes:
+    - my_components/energy_meter_mercury230/energy_meter_mercury230.h
+    - my_components/energy_meter_mercury230/mercury230_proto.h
+  on_boot:
+    priority: 600
+    then:
+       - script.execute: script_show_text
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  manual_ip:
+    static_ip: ${device_ip}
+    subnet: !secret wifi_subnet
+    gateway: !secret wifi_gateway
+
+
+  ap:
+    ssid:  ${upper_devicename} Hotspot
+    password: !secret ap_password
+
+captive_portal:
+
+debug:
+
+logger:
+  level: ERROR
+  #level: DEBUG
+  #baud_rate: 0
+
+api:
+#    password: !secret api_pass
+
+ota:
+    password: !secret ota_password
+
+web_server:
+  port: 80
+  auth:
+    username: !secret web_server_login
+    password: !secret web_server_password
+
+uart:
+  id: uart_bus
+  tx_pin: GPIO14
+  rx_pin: GPIO27
+  baud_rate: 9600
+  data_bits: 8
+  parity: NONE
+  stop_bits: 1
+
+binary_sensor:
+#статус устройства
+  - platform: status
+    name: ${upper_devicename} HA Connected
+# кнопка
+  - platform: gpio
+    pin:
+      number: GPIO32
+    name: $upper_devicename Button
+    internal: true
+    on_click:
+# переключить реле при коротком нажатии   
+      - min_length: 10ms
+        max_length: 1000ms
+        then:
+          - switch.toggle: relay_sw
+# restart esp , нужно зажать кнопку на 5000 секунд (ПОСЧИТАТЬ ДО 8)
+      - min_length: 4000ms
+        max_length: 6000ms
+        then:
+          - switch.toggle: restart_sw_id
+
+output:
+  - platform: ledc
+    id: red_led
+    pin:
+      number: GPIO4
+      inverted: False
+
+light:
+  - platform: monochromatic
+    output: red_led
+    id: relay_led
+    default_transition_length: 1ms 
+# для управления и индикации статуса
+# эта же нога используется для мигания при чтении ModBus
+  - platform: status_led
+    id: blue_led
+    internal: true
+    pin: GPIO16  
+    
+switch:
+#свитч рестарта устройства
+  - platform: restart
+    name: ${upper_devicename} Restart SW
+    id: restart_sw_id
+# реле
+  - platform: gpio
+    id: relay
+    pin: GPIO13
+#виртуальная кнопка, совмещает реле и диод
+  - platform: template
+    restore_state: true
+    name: $upper_devicename Relay
+    optimistic: true
+    id: relay_sw
+    internal: false
+    turn_on_action:
+    - switch.turn_on: relay
+    - light.turn_on: relay_led
+    turn_off_action:
+    - switch.turn_off: relay
+    - light.turn_off: relay_led
+#виртуальная кнопка, для скрытия длинного текста
+  - platform: template
+    name: $upper_devicename Hide Notes
+    optimistic: true
+    id: hide_notes
+    entity_category: config
+    icon: 'mdi:eye-off'
+    turn_on_action:
+      - script.execute: script_hide_text
+    turn_off_action:
+      - script.execute: script_show_text
+
+sensor:
+  - platform: energy_meter_mercury230
+    name: ${upper_devicename}
+    # не забываем подключить uart
+    uart_id: uart_bus
+    
+    # период цикла опроса счетчика
+    update_interval: 30s
+    # адрес счетчика (не обязательный), если не указан будет попытка обнаружить его с использованием пароля
+    use_address: 123
+    # пароль УКАЗЫВАТЬ В КАВЫЧКАХ для подключения (не обязательный), в случае дефолтного можно не указывать
+    password: "123456"
+    # тип пароля HEX или ASCII
+    #pass_in_hex: true
+
+    # Напряжение по трем фазам
+    voltage_a:
+      id: VoltA
+      name: ${upper_devicename} Volts A
+    voltage_b:
+      id: VoltB
+      name: ${upper_devicename} Volts B
+    voltage_c:
+      id: VoltC
+      name: ${upper_devicename} Volts C
+    # Токи
+    current_summ:
+      id: Amps
+      name: ${upper_devicename} Ampers Summ
+    current_a:
+      id: AmpA
+      name: ${upper_devicename} Ampers A
+    current_b:
+      id: AmpB
+      name: ${upper_devicename} Ampers B
+    current_c:
+      id: AmpC
+      name: ${upper_devicename} Ampers C
+    # Мощности
+    power_summ:    
+      id: Watts
+      name: ${upper_devicename} Watts Summ
+    power_a:
+      id: WattA
+      name: ${upper_devicename} Watts A
+    power_b:
+      id: WattB
+      name: ${upper_devicename} Watts B
+    power_c:
+      id: WattC
+      name: ${upper_devicename} Watts C
+    # Коэфициенты
+    power_factor_a:
+      id: RatioA
+      name: ${upper_devicename} Ratio A
+    power_factor_b:
+      id: RatioB
+      name: ${upper_devicename} Ratio B
+    power_factor_c:
+      id: RatioC
+      name: ${upper_devicename} Ratio C
+    # Фазовые углы
+    phase_angle_a:
+      id: AngleA
+      name: ${upper_devicename} Angle A
+    phase_angle_b:
+      id: AngleB
+      name: ${upper_devicename} Angle B
+    phase_angle_c:
+      id: AngleC
+      name: ${upper_devicename} Angle C
+    # Показания
+    energy_aa:
+      id: ValueAA
+      name: ${upper_devicename} Value A Active
+    energy_ra:
+      id: ValueRA
+      name: ${upper_devicename} Value A Reactive
+
+    energy_ab:
+      id: ValueAB
+      name: ${upper_devicename} Value B Active
+    energy_rb:
+      id: ValueRB
+      name: ${upper_devicename} Value B Reactive
+
+    energy_ac:
+      id: ValueAC
+      name: ${upper_devicename} Value C Active
+    energy_rc:
+      id: ValueRC
+      name: ${upper_devicename} Value C Reactive
+
+
+    # Частота
+    frequency:
+      name: ${upper_devicename} Frequency
+      id: Freq
+    serial_number:
+      name: ${upper_devicename} Serial Number
+      id: sn_string
+    connect_status:  
+      name: ${upper_devicename} Last Error
+      id: error_string
+    date_fabricate:  
+      name: ${upper_devicename} Date Fabricate
+      id: fab_string
+    # версия прошивки
+    firmware_version:
+      name: ${upper_devicename} Version
+      id: ver_string
+    # индикатор статуса связи
+    active_led_pin: GPIO16
+  # мощность WIFI сигнала
+  - platform: wifi_signal
+    name: ${upper_devicename} WiFi Signal
+    update_interval: 30s
+    unit_of_measurement: "dBa"
+    state_class: measurement
+    device_class: signal_strength
+    accuracy_decimals: 0
+  # время работы устройства после загрузки
+  - platform: uptime
+    name: ${upper_devicename} Uptime Sensor
+
+text_sensor:
+#версия прошивки
+  - platform: version
+    name: $upper_devicename ESPHome Version
+#текстовая форма uptime    
+  - platform: template
+    name: ${upper_devicename} Uptime
+    entity_category: diagnostic
+    icon: 'mdi:timer'
+    lambda: |-
+      uint32_t dur=millis()/1000;
+      char buffer[19];
+      if(dur>=86400) sprintf(buffer,"%ud %uh %02um %02us", dur/86400, dur%86400/3600, dur%3600/60, dur%60);
+      else if(dur>=3600) sprintf(buffer,"%uh %02um %02us", dur/3600, dur%3600/60, dur%60);
+      else sprintf(buffer,"%um %02us", dur/60, dur%60);
+      return {buffer};
+#локализация устройства, скрывается переключателем, для удобства работы в веб интерфейсе
+  - platform: template
+    name: ${upper_devicename} Location
+    entity_category: diagnostic
+    id: location
+    icon: 'mdi:map-marker-radius'
+#железо устройства (на основе чего сделано), скрывается переключателем, для удобства работы в веб интерфейсе
+  - platform: template
+    name: ${upper_devicename} Hardware
+    entity_category: diagnostic
+    id: hardware
+    icon: 'mdi:saw-blade'
+#точка подключения Wifi
+  - platform: wifi_info
+    ssid:
+      name: ${upper_devicename} Connected SSID
+    bssid:
+      name: ${upper_devicename} Connected BSSID 
+      
+script:
+# процедура публикации большых текстовых кусков, сворачиваем для работы в веб морде
+  - id: script_show_text
+    then:
+     -  lambda: |-
+          id(location).publish_state("${location}");
+          id(hardware).publish_state("ESP32 custom, ModBus adapter and other.");
+# процедура публикации большых текстовых кусков, сворачиваем для работы в веб морде
+  - id: script_hide_text
+    then:
+     -  lambda: |-
+          char buffer[]="Turn 'Hide Notes'";
+          id(location).publish_state(buffer);
+          id(hardware).publish_state(buffer);
+      

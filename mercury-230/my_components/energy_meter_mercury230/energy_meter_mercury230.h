@@ -149,7 +149,9 @@ class Mercury : public Sensor, public PollingComponent  {
         bool cbKoef=false;
         bool cbAngles=false;
         bool cbFreq=false;
-        bool cbValues=false;
+        bool cbValuesA=false;
+        bool cbValuesB=false;
+        bool cbValuesC=false;
 
         // калбэки для отладки
         bool debugIn=false;
@@ -352,12 +354,12 @@ class Mercury : public Sensor, public PollingComponent  {
             cbKoef=(this->RatioA!=nullptr || this->RatioB!=nullptr || this->RatioC!=nullptr);
             cbAngles=(this->AngleA!=nullptr || this->AngleB!=nullptr || this->AngleC!=nullptr);
             cbFreq=(this->Freq!=nullptr);
-            cbValues=(this->ValueAA!=nullptr || this->ValueAA!=nullptr);
-            cbValues=(this->ValueAB!=nullptr || this->ValueAB!=nullptr);
-            cbValues=(this->ValueAC!=nullptr || this->ValueAC!=nullptr);
-            cbValues=(this->ValueRA!=nullptr || this->ValueRA!=nullptr);
-            cbValues=(this->ValueRB!=nullptr || this->ValueRB!=nullptr);
-            cbValues=(this->ValueRC!=nullptr || this->ValueRC!=nullptr);
+            cbValuesA=(this->ValueAA!=nullptr || this->ValueRA!=nullptr);
+            cbValuesB=(this->ValueAB!=nullptr || this->ValueRB!=nullptr);
+            cbValuesC=(this->ValueAC!=nullptr || this->ValueRC!=nullptr);
+//            cbValues=(this->ValueRA!=nullptr || this->ValueRA!=nullptr);
+//            cbValues=(this->ValueRB!=nullptr || this->ValueRB!=nullptr);
+//            cbValues=(this->ValueRC!=nullptr || this->ValueRC!=nullptr);
             // включение отладки (TODO: увязать с флагом отладки)
             debugIn=true;  // будем печатать входящие
             debugOut=true; //  и исходящие пакеты

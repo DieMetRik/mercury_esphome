@@ -502,9 +502,9 @@
                         // поиск адреса только если он нулевой и пока не найдем дальше не работаем
                         else if (counter==2 && addr==0){sGetAddr(); counter=13; procError=true; break;} 
                         else if (counter==3){sGetVers(); break;}     // далее версию, дату изготовления, серийник
-                        else if (counter==4){if(cbValues){sGetValue_A();  break;}}   // показания
-                        else if (counter==5){if(cbValues){sGetValue_B();  break;}}   // показания
-                        else if (counter==6){if(cbValues){sGetValue_C();  break;}}   // показания
+                        else if (counter==4){if(cbValuesA){sGetValue_A();  break;}}   // показания
+                        else if (counter==5){if(cbValuesB){sGetValue_B();  break;}}   // показания
+                        else if (counter==6){if(cbValuesC){sGetValue_C();  break;}}   // показания
                         else if (counter==7){if(cbPower){sGetPower(); break;}}     // на этом шаге можем считать мощность
                         else if (counter==8){if(cbVolt){sGetVoltage(); break;}}    // вольты
                         else if (counter==9){if(cbCurrent){sGetCurrent(); break;}} // ток

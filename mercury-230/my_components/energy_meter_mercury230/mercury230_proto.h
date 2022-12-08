@@ -1,5 +1,5 @@
-#Автор кода https://github.com/Brokly/ESPHome-Mercury230
-#My telegram https://t.me/DieMetRik
+//Автор кода https://github.com/Brokly/ESPHome-Mercury230
+//My telegram https://t.me/DieMetRik
 #ifndef MERCURY230_PROTO_H
 #define MERCURY230_PROTO_H
 

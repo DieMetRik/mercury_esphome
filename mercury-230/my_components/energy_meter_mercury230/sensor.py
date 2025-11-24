@@ -161,7 +161,7 @@ ratioSensor=sensor.sensor_schema(
     )
 
 initParams = {
-     cv.GenerateID(): cv.declare_id(Mercury230),
+     # cv.GenerateID(): cv.declare_id(Mercury230),
      # частота
      cv.Optional(CONF_FREQUENCY): sensor.sensor_schema(
         unit_of_measurement=UNIT_HERTZ,
@@ -271,7 +271,8 @@ initParams[cv.Optional(CONF_POWER_FACTOR+PhA)] = ratioSensor;
 initParams[cv.Optional(CONF_POWER_FACTOR+PhB)] = ratioSensor;
 initParams[cv.Optional(CONF_POWER_FACTOR+PhC)] = ratioSensor;
 
-CONFIG_SCHEMA = cv.All(sensor.SENSOR_SCHEMA.extend(initParams).extend(uart.UART_DEVICE_SCHEMA).extend(cv.COMPONENT_SCHEMA), output_info)
+#CONFIG_SCHEMA = cv.All(sensor.SENSOR_SCHEMA.extend(initParams).extend(uart.UART_DEVICE_SCHEMA).extend(cv.COMPONENT_SCHEMA), output_info)
+CONFIG_SCHEMA = cv.All(sensor.sensor_schema(Mercury230).extend(initParams).extend(uart.UART_DEVICE_SCHEMA).extend(cv.COMPONENT_SCHEMA), output_info)
 
 async def to_code(config):
     #_LOGGER.info("--------------")

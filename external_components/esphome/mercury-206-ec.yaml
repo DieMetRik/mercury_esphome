@@ -69,7 +69,7 @@ mercury:
   id: my_meter
   update_interval: 500ms
   # Здесь можно добавить серийный номер если вынести его в конфиг
-  serial_number: XXXXXXX
+  serial_number: XXXXXX
 
 # Подключаем сенсоры к контроллеру
 sensor:
@@ -156,7 +156,7 @@ sensor:
         - text_sensor.template.publish:
             id: uptime_human
             state: !lambda |-
-              int seconds = round(id(uptime_sensor).raw_state);
+              int seconds = round(id(uptime_sensor).get_raw_state());
               int days = seconds / (24 * 3600);
               seconds = seconds % (24 * 3600);
               int hours = seconds / 3600;

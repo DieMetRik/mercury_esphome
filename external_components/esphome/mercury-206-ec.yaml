@@ -69,27 +69,73 @@ mercury:
   id: my_meter
   update_interval: 500ms
   # Здесь можно добавить серийный номер если вынести его в конфиг
-  serial_number: XXXXXX
+  serial_number: XXXXXXX
 
 # Подключаем сенсоры к контроллеру
 sensor:
   - platform: mercury
     voltage:
       name: "mercury_voltage"
+      device_class: voltage
+      state_class: measurement
+      icon: "mdi:alpha-v-circle-outline"
+      unit_of_measurement: "V"
+      accuracy_decimals: 1
+
     current:
       name: "mercury_current"
+      device_class: current
+      state_class: measurement
+      icon: "mdi:alpha-a-circle-outline"
+      unit_of_measurement: "A"
+      accuracy_decimals: 2
+
     power:
       name: "mercury_power"
+      device_class: power
+      state_class: measurement
+      icon: "mdi:alpha-p-circle-outline"
+      unit_of_measurement: "W"
+      accuracy_decimals: 0
+
     t1:
       name: "mercury_t1_energy"
+      icon: "mdi:counter"
+      unit_of_measurement: "kWh"
+      accuracy_decimals: 2
+      device_class: energy
+      state_class: total_increasing
+
     t2:
       name: "mercury_t2_energy"
+      icon: "mdi:counter"
+      unit_of_measurement: "kWh"
+      accuracy_decimals: 2
+      device_class: energy
+      state_class: total_increasing
+
+
     t3:
       name: "mercury_t3_energy"
+      icon: "mdi:counter"
+      unit_of_measurement: "kWh"
+      accuracy_decimals: 2
+      device_class: energy
+      state_class: total_increasing
+      
     total:
       name: "mercury_sum_tariff"
+      icon: "mdi:counter"
+      unit_of_measurement: "kWh"
+      accuracy_decimals: 2
+
     frequency:
       name: "mercury_frequency"
+      icon: "mdi:sine-wave"
+      device_class: frequency
+      state_class: measurement
+      unit_of_measurement: "Hz"
+      accuracy_decimals: 2
 
   - platform: debug
     free:

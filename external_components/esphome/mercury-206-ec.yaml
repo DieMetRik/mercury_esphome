@@ -1,0 +1,142 @@
+substitutions:
+  device_name: "mercury-206-es"
+  device_ip: 192.168.1.XXX
+  device_description: "Мониторинг эл. счетчика Меркурий"
+  board: esp32dev
+  platform: esp32
+  type: arduino
+
+esphome:
+  name: ${device_name}
+  name_add_mac_suffix: false
+  comment: ${device_description}
+
+${platform}:
+  board: ${board}
+  framework:
+    type: ${type}
+
+# Подключаем локальную папку с компонентами
+external_components:
+  - source: 
+      type: local
+      path: my_components
+# Настройка логирования и API
+logger:
+  level: debug
+
+ota:
+- platform: esphome  
+  password: !secret ota_password
+
+api:
+  encryption:
+    key: !secret encryption_key
+
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk:
+    pin: GPIO0
+    mode: CLK_EXT_IN
+
+  phy_addr: 1
+  power_pin: GPIO16
+
+  manual_ip: 
+    static_ip: ${device_ip}
+    gateway: !secret wifi_gateway
+    subnet: !secret wifi_subnet
+
+web_server:
+  port: 80
+  include_internal: true
+  auth:
+    username: !secret web_server_login
+    password: !secret web_server_password
+debug:
+  update_interval: 5s
+
+uart:
+  id: uart_bus
+  tx_pin: GPIO17
+  rx_pin: GPIO5
+  baud_rate: 9600
+
+# Инициализируем основной контроллер
+mercury:
+  id: my_meter
+  update_interval: 500ms
+  # Здесь можно добавить серийный номер если вынести его в конфиг
+  serial_number: XXXXXX
+
+# Подключаем сенсоры к контроллеру
+sensor:
+  - platform: mercury
+    voltage:
+      name: "mercury_voltage"
+    current:
+      name: "mercury_current"
+    power:
+      name: "mercury_power"
+    t1:
+      name: "mercury_t1_energy"
+    t2:
+      name: "mercury_t2_energy"
+    t3:
+      name: "mercury_t3_energy"
+    total:
+      name: "mercury_sum_tariff"
+    frequency:
+      name: "mercury_frequency"
+
+  - platform: debug
+    free:
+      name: "Heap Free"
+    block:
+      name: "Heap Max Block"
+    loop_time:
+      name: "Loop Time"
+
+
+#Uptime - показывает сколько устройство работает в сети. Тоже нужно было для отпладки.
+  - platform: uptime
+    name: ${device_name} uptime
+    id: uptime_sensor
+    internal: true
+    on_raw_value:
+      then:
+        - text_sensor.template.publish:
+            id: uptime_human
+            state: !lambda |-
+              int seconds = round(id(uptime_sensor).raw_state);
+              int days = seconds / (24 * 3600);
+              seconds = seconds % (24 * 3600);
+              int hours = seconds / 3600;
+              seconds = seconds % 3600;
+              int minutes = seconds /  60;
+              seconds = seconds % 60;
+              return (
+                (days ? to_string(days) + "d " : "") +
+                (hours ? to_string(hours) + "h " : "") +
+                (minutes ? to_string(minutes) + "m " : "") +
+                (to_string(seconds) + "s")
+              ).c_str();
+
+text_sensor:
+  - platform: mercury
+    datetime:
+      name: "mercury_datetime"
+  - platform: version
+    name: ${device_name} version
+    hide_timestamp: true
+
+  - platform: template
+    name: ${device_name} uptime
+    id: uptime_human
+    icon: mdi:clock-start
+
+  - platform: debug
+    reset_reason:
+      name: "Reset Reason"
